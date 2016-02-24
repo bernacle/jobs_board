@@ -1,6 +1,7 @@
 class JobsController < ApplicationController
 
   before_action :find_job, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, except: :index
 
   def index
     if params[:category].blank?
@@ -15,7 +16,12 @@ class JobsController < ApplicationController
   end
 
   def new
-    @job = Job.new
+    if current_user.admin?
+      @job = Job.new
+    else
+      flash.now[:alert] = "You are not a Admin User"
+      redirect_to root_url
+    end
   end
 
   def create
